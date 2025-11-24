@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://beimuioo.github.io/tags/index.html</loc>
+    
+    <lastmod>2025-11-23</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/categories/index.html</loc>
+    
+    <lastmod>2025-11-23</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://beimuioo.github.io/manifest.json</loc>
     
     <lastmod>2025-11-21</lastmod>
@@ -28,15 +46,95 @@
     <priority>0.6</priority>
   </url>
   
+  <url>
+    <loc>https://beimuioo.github.io/posts/9d9648b3.html</loc>
+    
+    <lastmod>2025-11-20</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/posts/b5751651.html</loc>
+    
+    <lastmod>2025-11-20</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/posts/deb85d45.html</loc>
+    
+    <lastmod>2025-11-20</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/posts/5decabe4.html</loc>
+    
+    <lastmod>2025-11-20</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/posts/5e1c01b0.html</loc>
+    
+    <lastmod>2025-11-20</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
 
   <url>
     <loc>https://beimuioo.github.io/</loc>
-    <lastmod>2025-11-21</lastmod>
+    <lastmod>2025-11-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
+  <url>
+    <loc>https://beimuioo.github.io/tags/%E6%94%BB%E9%98%B2/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
+  
+  <url>
+    <loc>https://beimuioo.github.io/categories/windows/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/categories/linux/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/categories/%E7%97%85%E6%AF%92/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://beimuioo.github.io/categories/webshell/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
 </urlset>

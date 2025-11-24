@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第5篇：勒索病毒自救指南 | 土豆不配番茄酱</title><meta name="author" content="llm"><meta name="copyright" content="llm"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="第5篇：勒索病毒自救指南前言经常会有一些小伙伴问：中了勒索病毒，该怎么办，可以解密吗？ 第一次遇到勒索病毒是在早几年的时候，客户因网站访问异常，进而远程协助进行排查。登录服务器，在站点目录下发现所有的脚本文件及附件后缀名被篡改，每个文件夹下都有一个文件打开后显示勒索提示信息，这便是勒索病毒的特征。 出于职业习惯，我打包了部分加密文件样本和勒索病毒提示信息用于留档，就在今天，我又重新上传了样本，至今">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第5篇：勒索病毒自救指南">
+<meta property="og:url" content="https://beimuioo.github.io/posts/5decabe4.html">
+<meta property="og:site_name" content="土豆不配番茄酱">
+<meta property="og:description" content="第5篇：勒索病毒自救指南前言经常会有一些小伙伴问：中了勒索病毒，该怎么办，可以解密吗？ 第一次遇到勒索病毒是在早几年的时候，客户因网站访问异常，进而远程协助进行排查。登录服务器，在站点目录下发现所有的脚本文件及附件后缀名被篡改，每个文件夹下都有一个文件打开后显示勒索提示信息，这便是勒索病毒的特征。 出于职业习惯，我打包了部分加密文件样本和勒索病毒提示信息用于留档，就在今天，我又重新上传了样本，至今">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://beimuioo.github.io/img/3.jpg">
+<meta property="article:published_time" content="2025-11-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-11-20T16:00:00.000Z">
+<meta property="article:author" content="llm">
+<meta property="article:tag" content="攻防">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://beimuioo.github.io/img/3.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "第5篇：勒索病毒自救指南",
+  "url": "https://beimuioo.github.io/posts/5decabe4.html",
+  "image": "https://beimuioo.github.io/img/3.jpg",
+  "datePublished": "2025-11-20T16:00:00.000Z",
+  "dateModified": "2025-11-20T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "llm",
+      "url": "https://beimuioo.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://beimuioo.github.io/posts/5decabe4.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><meta name="msapplication-TileColor" content="#6C63FF"/><link rel="apple-touch-icon" sizes="180x180" href="/img/siteicon/128.png"/><link rel="icon" type="image/png" sizes="32x32" href="/img/siteicon/32.png"/><link rel="icon" type="image/png" sizes="16x16" href="/img/siteicon/16.png"/><link rel="mask-icon" href="/img/siteicon/128.png" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css?v=5.5.2"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":true,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第5篇：勒索病毒自救指南',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.zhimg.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.zhimg.com/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://unpkg.zhimg.com/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="土豆不配番茄酱" type="application/atom+xml">
+</head><body><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><div class="loading-img"></div><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (false) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><div id="web_bg" style="background-image: url(https://s21.ax1x.com/2025/11/17/pZiZFdH.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/bread.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 首页</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="javascript:void(0);"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/categories/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 分类</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 标签</span></a></li></ul></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/comments/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 留言板</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/link/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 友人帐</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/bangumis/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 追番</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/about/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/3.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">土豆不配番茄酱</span></a><a class="nav-page-title" href="/"><span class="site-name">第5篇：勒索病毒自救指南</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><!--span= ' ' + _p('search.title')--></span></div><div class="menus_items"><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 首页</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="javascript:void(0);"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child faa-parent animated-hover" href="/categories/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 分类</span></a></li><li><a class="site-page child faa-parent animated-hover" href="/tags/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 标签</span></a></li></ul></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/comments/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 留言板</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/link/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 友人帐</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/bangumis/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 追番</span></a></div><div class="menus_item"><a class="site-page faa-parent animated-hover" href="/about/"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-yueliang"></use></svg><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">第5篇：勒索病毒自救指南</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-11-20T16:00:00.000Z" title="发表于 2025-11-21 00:00:00">2025-11-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-11-20T16:00:00.000Z" title="更新于 2025-11-21 00:00:00">2025-11-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%97%85%E6%AF%92/">病毒</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">806</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="第5篇：勒索病毒自救指南"><a href="#第5篇：勒索病毒自救指南" class="headerlink" title="第5篇：勒索病毒自救指南"></a>第5篇：勒索病毒自救指南</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>经常会有一些小伙伴问：中了勒索病毒，该怎么办，可以解密吗？</p>
+<p>第一次遇到勒索病毒是在早几年的时候，客户因网站访问异常，进而远程协助进行排查。登录服务器，在站点目录下发现所有的脚本文件及附件后缀名被篡改，每个文件夹下都有一个文件打开后显示勒索提示信息，这便是勒索病毒的特征。</p>
+<p>出于职业习惯，我打包了部分加密文件样本和勒索病毒提示信息用于留档，就在今天，我又重新上传了样本，至今依然无法解密。</p>
+<p>作为一个安全工程师，而非一个专业的病毒分析师，我们可以借助各大安全公司的能力，寻找勒索病毒的解密工具。</p>
+<p>本文整理了一份勒索病毒自救指南，通过勒索病毒索引引擎查找勒索病毒相关信息，再通过各个安全公司提供的免费勒索软件解密工具解密。当然，能否解密全凭运气，so，平时还是勤打补丁多备份。</p>
+<p><strong>一、勒索病毒搜索引擎</strong></p>
+<p>在勒索病毒搜索引擎输入病毒名、勒索邮箱、被加密后文件的后缀名，或直接上传被加密文件、勒索提示信息，即可可快速查找到病毒详情和解密工具。</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="./image/20200406-1.png" alt=""></p>
+<p>这些网站的解密能力还在持续更新中，是值得收藏的几个勒索病毒工具型网站。</p>
+<p>【360】 勒索病毒搜索引擎，支持检索超过800种常见勒索病毒</p>
+<p>官网：<a target="_blank" rel="noopener" href="http://lesuobingdu.360.cn">http://lesuobingdu.360.cn</a></p>
+<p>【腾讯】 勒索病毒搜索引擎，支持检索超过 300 种常见勒索病毒</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://guanjia.qq.com/pr/ls">https://guanjia.qq.com/pr/ls</a></p>
+<p>【启明】VenusEye勒索病毒搜索引擎，超300种勒索病毒家族</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://lesuo.venuseye.com.cn">https://lesuo.venuseye.com.cn</a></p>
+<p>【奇安信】勒索病毒搜索引擎</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://lesuobingdu.qianxin.com">https://lesuobingdu.qianxin.com</a></p>
+<p>【深信服】勒索病毒搜索引擎</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://edr.sangfor.com.cn/#/information/ransom_search">https://edr.sangfor.com.cn/#/information/ransom_search</a></p>
+<hr>
+<p><strong>二、勒索软件解密工具集</strong></p>
+<p>很多安全公司都提供了免费的勒索病毒解密工具下载，收集和整理相关下载地址，可以帮助我们了解和获取最新的勒索病毒解密工具。</p>
+<p>【腾讯哈勃】勒索软件专杀工具</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://habo.qq.com/tool">https://habo.qq.com/tool</a></p>
+<p>【金山毒霸】勒索病毒免疫工具</p>
+<p>官网：<a target="_blank" rel="noopener" href="http://www.duba.net/dbt/wannacry.html">http://www.duba.net/dbt/wannacry.html</a></p>
+<p>【火绒】安全工具下载</p>
+<p>官网：<a target="_blank" rel="noopener" href="http://bbs.huorong.cn/forum-55-1.html">http://bbs.huorong.cn/forum-55-1.html</a></p>
+<p>【瑞星】解密工具下载</p>
+<p>官网：<a target="_blank" rel="noopener" href="http://it.rising.com.cn/fanglesuo/index.html">http://it.rising.com.cn/fanglesuo/index.html</a></p>
+<p>【nomoreransom】勒索软件解密工具集</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://www.nomoreransom.org/zh/index.html">https://www.nomoreransom.org/zh/index.html</a></p>
+<p>【MalwareHunterTeam】勒索软件解密工具集</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://id-ransomware.malwarehunterteam.com">https://id-ransomware.malwarehunterteam.com</a></p>
+<p>【卡巴斯基】免费勒索解密器</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://noransom.kaspersky.com">https://noransom.kaspersky.com</a></p>
+<p>【Avast】免费勒索软件解密工具</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://www.avast.com/zh-cn/ransomware-decryption-tools">https://www.avast.com/zh-cn/ransomware-decryption-tools</a></p>
+<p>【Emsisoft】免费勒索软件解密工具</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://www.emsisoft.com/ransomware-decryption-tools/free-download">https://www.emsisoft.com/ransomware-decryption-tools/free-download</a></p>
+<p>【GitHub 项目】勒索病毒解密工具收集汇总</p>
+<p>官网：<a target="_blank" rel="noopener" href="https://github.com/jiansiting/Decryption-Tools">https://github.com/jiansiting/Decryption-Tools</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://beimuioo.github.io">llm</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://beimuioo.github.io/posts/5decabe4.html">https://beimuioo.github.io/posts/5decabe4.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://beimuioo.github.io" target="_blank">土豆不配番茄酱</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%94%BB%E9%98%B2/">攻防</a></div><div class="post-share"><div class="social-share" data-image="/img/3.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/5e1c01b0.html" title="第4篇：如何发现隐藏的 Webshell 后门"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/9.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">第4篇：如何发现隐藏的 Webshell 后门</div></div><div class="info-2"><div class="info-item-1">第4篇：如何发现隐藏的 Webshell 后门前言：如何在百万行代码里发现隐藏的后门？ 试想一下，如果你的网站被入侵，攻击者留下隐藏的后门，你真的都可以找出来吗？面对一个大中型的应用系统，数以百万级的代码行，是不可能做到每个文件每段代码进行手工检查的。 即使是一款拥有 99.9% 的 Webshell 检出率的检测引擎，依然可能存在 Webshell 绕过的情况。另外，像暗链、网页劫持、页面跳转等常见的黑帽 SEO 手法，也很难通过手动检测或工具检测全部识别出来。 最好的方式就是做文件完整性验证。通过与原始代码对比，可以快速发现文件是否被篡改以及被篡改的位置。当然，第一个前提是，你所在的团队已具备代码版本管理的能力，如果你是个人站长，相信你已经备份了原始代码。 本文将结合实际应用，介绍几种文件完整性验证方式，可以帮助你找出代码中所有隐藏的后门。  1、文件 MD5 校验 下载D盾_Web查杀工具的时候，我们可以留意到下载的压缩包里，除了有一个 exe 可执行文件，还有一个文件 md5 值。这个是软件作者在发布软件时，通过 md5 算法计算出该 exe 文件的”特征值”。 12下载...</div></div></div></a><a class="pagination-related" href="/posts/deb85d45.html" title="第1篇：windows 入侵排查"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/14.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">第1篇：windows 入侵排查</div></div><div class="info-2"><div class="info-item-1">第1篇：windows 入侵排查0x00 前言当企业发生黑客入侵、系统崩溃或其它影响业务正常运行的安全事件时，急需第一时间进行处理，使企业的网络信息系统在最短时间内恢复正常工作，进一步查找入侵来源，还原入侵事故过程，同时给出解决方案与防范措施，为企业挽回或减少经济损失。   常见的应急响应事件分类： Web 入侵：网页挂马、主页篡改、Webshell 系统入侵：病毒木马、勒索软件、远控后门 网络攻击：DDOS 攻击、DNS 劫持、ARP 欺骗 针对常见的攻击事件，结合工作中应急响应事件分析和解决的方法，总结了一些 Windows 服务器入侵排查的思路。 0x01 入侵排查思路1.1 检查系统账号安全1、查看服务器是否有弱口令，远程管理端口是否对公网开放。  检查方法：据实际情况咨询相关服务器管理员。  2、查看服务器是否存在可疑账号、新增账号。  检查方法：打开 cmd 窗口，输入 lusrmgr.msc 命令，查看是否有新增/可疑的账号，如有管理员群组的（Administrators）里的新增账户，如有，请立即禁用或删除掉。   3、查看服务器是否存在隐藏账号、克隆账号。  检...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/9d9648b3.html" title="第2篇：Linux 入侵排查"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/6.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-21</div><div class="info-item-2">第2篇：Linux 入侵排查</div></div><div class="info-2"><div class="info-item-1">第2篇：Linux 入侵排查0x00 前言当企业发生黑客入侵、系统崩溃或其它影响业务正常运行的安全事件时，急需第一时间进行处理，使企业的网络信息系统在最短时间内恢复正常工作，进一步查找入侵来源，还原入侵事故过程，同时给出解决方案与防范措施，为企业挽回或减少经济损失。   针对常见的攻击事件，结合工作中应急响应事件分析和解决的方法，总结了一些 Linux 服务器入侵排查的思路。 0x01 入侵排查思路1.1 账号安全基本使用： 1234567891、用户信息文件 /etc/passwdroot:x:0:0:root:/root:/bin/bashaccount:password:UID:GID:GECOS:directory:shell用户名：密码：用户ID：组ID：用户说明：家目录：登陆之后的 shell注意：无密码只允许本机登陆，远程不允许登陆2、影子文件 /etc/shadowroot:$6$oGs1PqhL2p3ZetrE$X7o7bzoouHQVSEmSgsYN5UD4.kMHx6qgbTqwNVC5oOAouXvcjQSt.Ft7ql1WpkopY0UV9ajBwUt1...</div></div></div></a><a class="pagination-related" href="/posts/b5751651.html" title="第3篇：常见的 Webshell 查杀工具"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/2.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-21</div><div class="info-item-2">第3篇：常见的 Webshell 查杀工具</div></div><div class="info-2"><div class="info-item-1">第3篇：常见的 Webshell 查杀工具前言当网站服务器被入侵时，我们需要一款Webshell检测工具，来帮助我们发现webshell，进一步排查系统可能存在的安全漏洞。 本文推荐了10款 WebShell 检测工具，用于网站入侵排查。当然，目前市场上的很多主机安全产品也都提供这种 WebShell 检测能力，比如阿里云、青藤云、safedog 等，本文暂不讨论。  1、D盾_Web查杀 阿D出品，使用自行研发不分扩展名的代码分析引擎，能分析更为隐藏的 WebShell 后门行为。 兼容性：只提供 Windows 版本。 工具下载地址：http://www.d99net.net  2、百度 WEBDIR+ 下一代 WebShell 检测引擎，采用先进的动态监测技术，结合多种引擎零规则查杀。 兼容性：提供在线查杀木马，免费开放 API 支持批量检测。 在线查杀地址：https://scanner.baidu.com  3、河马 专注 WebShell 查杀研究，拥有海量 WebShell 样本和自主查杀技术，采用传统特征+云端大数据双引擎的查杀技术。查杀速度快、精度高、误报低。 ...</div></div></div></a><a class="pagination-related" href="/posts/deb85d45.html" title="第1篇：windows 入侵排查"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/14.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-21</div><div class="info-item-2">第1篇：windows 入侵排查</div></div><div class="info-2"><div class="info-item-1">第1篇：windows 入侵排查0x00 前言当企业发生黑客入侵、系统崩溃或其它影响业务正常运行的安全事件时，急需第一时间进行处理，使企业的网络信息系统在最短时间内恢复正常工作，进一步查找入侵来源，还原入侵事故过程，同时给出解决方案与防范措施，为企业挽回或减少经济损失。   常见的应急响应事件分类： Web 入侵：网页挂马、主页篡改、Webshell 系统入侵：病毒木马、勒索软件、远控后门 网络攻击：DDOS 攻击、DNS 劫持、ARP 欺骗 针对常见的攻击事件，结合工作中应急响应事件分析和解决的方法，总结了一些 Windows 服务器入侵排查的思路。 0x01 入侵排查思路1.1 检查系统账号安全1、查看服务器是否有弱口令，远程管理端口是否对公网开放。  检查方法：据实际情况咨询相关服务器管理员。  2、查看服务器是否存在可疑账号、新增账号。  检查方法：打开 cmd 窗口，输入 lusrmgr.msc 命令，查看是否有新增/可疑的账号，如有管理员群组的（Administrators）里的新增账户，如有，请立即禁用或删除掉。   3、查看服务器是否存在隐藏账号、克隆账号。  检...</div></div></div></a><a class="pagination-related" href="/posts/5e1c01b0.html" title="第4篇：如何发现隐藏的 Webshell 后门"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/9.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-21</div><div class="info-item-2">第4篇：如何发现隐藏的 Webshell 后门</div></div><div class="info-2"><div class="info-item-1">第4篇：如何发现隐藏的 Webshell 后门前言：如何在百万行代码里发现隐藏的后门？ 试想一下，如果你的网站被入侵，攻击者留下隐藏的后门，你真的都可以找出来吗？面对一个大中型的应用系统，数以百万级的代码行，是不可能做到每个文件每段代码进行手工检查的。 即使是一款拥有 99.9% 的 Webshell 检出率的检测引擎，依然可能存在 Webshell 绕过的情况。另外，像暗链、网页劫持、页面跳转等常见的黑帽 SEO 手法，也很难通过手动检测或工具检测全部识别出来。 最好的方式就是做文件完整性验证。通过与原始代码对比，可以快速发现文件是否被篡改以及被篡改的位置。当然，第一个前提是，你所在的团队已具备代码版本管理的能力，如果你是个人站长，相信你已经备份了原始代码。 本文将结合实际应用，介绍几种文件完整性验证方式，可以帮助你找出代码中所有隐藏的后门。  1、文件 MD5 校验 下载D盾_Web查杀工具的时候，我们可以留意到下载的压缩包里，除了有一个 exe 可执行文件，还有一个文件 md5 值。这个是软件作者在发布软件时，通过 md5 算法计算出该 exe 文件的”特征值”。 12下载...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/bread.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">llm</div><div class="author-info-description">一个有趣的博客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon faa-parent animated-hover" href="https://github.com/beimuioo/beimuioo.github.io" target="_blank" title="Github"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-github"></use></svg></a><a class="social-icon faa-parent animated-hover" href="https://wx.mail.qq.com/home/index?sid=zWRkX4x5MG8uBEZ2AIdLNwAA#/list/1/1" target="_blank" title="Email"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-youxiang"></use></svg></a><a class="social-icon faa-parent animated-hover" href="/atom.xml" target="_blank" title="RSS"><svg class="icon faa-tada" aria-hidden="true"><use xlink:href="#icon-RSS"></use></svg></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC5%E7%AF%87%EF%BC%9A%E5%8B%92%E7%B4%A2%E7%97%85%E6%AF%92%E8%87%AA%E6%95%91%E6%8C%87%E5%8D%97"><span class="toc-number">1.</span> <span class="toc-text">第5篇：勒索病毒自救指南</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/4a17b156.html" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/12.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/posts/4a17b156.html" title="Hello World">Hello World</a><time datetime="2025-11-21T08:27:09.869Z" title="发表于 2025-11-21 16:27:09">2025-11-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/5c2fafc7.html" title="第一篇文章"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="第一篇文章"/></a><div class="content"><a class="title" href="/posts/5c2fafc7.html" title="第一篇文章">第一篇文章</a><time datetime="2025-11-20T16:00:00.000Z" title="发表于 2025-11-21 00:00:00">2025-11-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/9d9648b3.html" title="第2篇：Linux 入侵排查"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="第2篇：Linux 入侵排查"/></a><div class="content"><a class="title" href="/posts/9d9648b3.html" title="第2篇：Linux 入侵排查">第2篇：Linux 入侵排查</a><time datetime="2025-11-20T16:00:00.000Z" title="发表于 2025-11-21 00:00:00">2025-11-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/b5751651.html" title="第3篇：常见的 Webshell 查杀工具"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="第3篇：常见的 Webshell 查杀工具"/></a><div class="content"><a class="title" href="/posts/b5751651.html" title="第3篇：常见的 Webshell 查杀工具">第3篇：常见的 Webshell 查杀工具</a><time datetime="2025-11-20T16:00:00.000Z" title="发表于 2025-11-21 00:00:00">2025-11-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/deb85d45.html" title="第1篇：windows 入侵排查"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/14.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="第1篇：windows 入侵排查"/></a><div class="content"><a class="title" href="/posts/deb85d45.html" title="第1篇：windows 入侵排查">第1篇：windows 入侵排查</a><time datetime="2025-11-20T16:00:00.000Z" title="发表于 2025-11-21 00:00:00">2025-11-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By llm</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.2"></script><script src="/js/main.js?v=5.5.2"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="2756019215" data-server="netease" data-type="song" data-order="list" data-fixed="true" data-preload="auto" data-autoplay="false" data-mutex="true" > </div><script async src="//at.alicdn.com/t/c/font_5068095_shqdz6r1q8.js"></script><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/metingjs/dist/Meting.min.js"></script><div class="app-refresh" id="app-refresh" style="position: fixed;top: -2.2rem;left: 0;right: 0;z-index: 99999;padding: 0 1rem;font-size: 15px;height: 2.2rem;transition: all 0.3s ease;"><div class="app-refresh-wrap" style=" display: flex;color: #fff;height: 100%;align-items: center;justify-content: center;"><label>✨ 有新文章啦！ 👉</label><a href="javascript:void(0)" onclick="location.reload()"><span style="color: #fff;text-decoration: underline;cursor: pointer;">🍗点击食用🍔</span></a></div></div><script>if ('serviceWorker' in navigator) {
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+showNotification()
+})
+}
+window.addEventListener('load', function() {
+navigator.serviceWorker.register('/sw.js')
+})
+}
+function showNotification() {
+if (GLOBAL_CONFIG.Snackbar) {
+var snackbarBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+GLOBAL_CONFIG.Snackbar.bgLight :
+GLOBAL_CONFIG.Snackbar.bgDark
+var snackbarPos = GLOBAL_CONFIG.Snackbar.position
+Snackbar.show({
+text: '✨ 有新文章啦！ 👉',
+backgroundColor: snackbarBg,
+duration: 500000,
+pos: snackbarPos,
+actionText: '🍗点击食用🍔',
+actionTextColor: '#fff',
+onActionClick: function(e) {
+location.reload()
+},
+})
+} else {
+var showBg =
+document.documentElement.getAttribute('data-theme') === 'light' ?
+'#3b70fc' :
+'#1f1f1f'
+var cssText = `top: 0; background: ${showBg};`
+document.getElementById('app-refresh').style.cssText = cssText
+}
+}</script><script async data-pjax src="/"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.2"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 190px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 160px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/akilar-candyassets/image/cover1.webp);"> <a class="categoryBar-list-link" href="categories/windows/">windows</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">这是windows</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/akilar-candyassets/image/cover2.webp);"> <a class="categoryBar-list-link" href="categories/linux/">linux</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">这是linux</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/akilar-candyassets/image/cover3.webp);"> <a class="categoryBar-list-link" href="categories/病毒/">病毒</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">这是webshell</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/akilar-candyassets/image/cover4.webp);"> <a class="categoryBar-list-link" href="categories/webshell/">webshell</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">病毒解决</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='all'|| 'all' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="posts/b5751651.html" alt=""><img width="48" height="48" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/2.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-11-21</span><a class="blog-slider__title" href="posts/b5751651.html" alt="">第3篇：常见的 Webshell 查杀工具</a><div class="blog-slider__text">再怎么看我也不知道怎么描述它的啦！</div><a class="blog-slider__button" href="posts/b5751651.html" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="posts/9d9648b3.html" alt=""><img width="48" height="48" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/6.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-11-21</span><a class="blog-slider__title" href="posts/9d9648b3.html" alt="">第2篇：Linux 入侵排查</a><div class="blog-slider__text">再怎么看我也不知道怎么描述它的啦！</div><a class="blog-slider__button" href="posts/9d9648b3.html" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="posts/deb85d45.html" alt=""><img width="48" height="48" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/14.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-11-21</span><a class="blog-slider__title" href="posts/deb85d45.html" alt="">第1篇：windows 入侵排查</a><div class="blog-slider__text">这是windows入侵排查的一篇文章</div><a class="blog-slider__button" href="posts/deb85d45.html" alt="">详情   </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><script async src="//at.alicdn.com/t/c/font_5068095_shqdz6r1q8.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__backInLeft');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>

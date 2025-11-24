@@ -324,16 +324,16 @@ div#category {
   margin: 30px 0px 0px 0px;
 }
 /* 鼠标图标 */
-body {
-  cursor: url('/img/normal.ani'), auto;
-}
-a,
-[type='button']:not(:disabled),
-[type='reset']:not(:disabled),
-[type='submit']:not(:disabled),
-button:not(:disabled) {
-  cursor: url('/img/link.ani'), auto !important;
-}
+/*body {*/
+/*  cursor: url('/img/person.cur'), auto;*/
+/*}*/
+/*a,*/
+/*[type='button']:not(:disabled),*/
+/*[type='reset']:not(:disabled),*/
+/*[type='submit']:not(:disabled),*/
+/*button:not(:disabled) {*/
+/*  cursor: url('/img/link.cur'), auto !important;*/
+/*}*/
 
 /* md网站下划线 */
 #article-container a:hover {
@@ -476,10 +476,10 @@ button:not(:disabled) {
 #nav .menus_items .menus_item:hover .menus_item_child {
   display: flex !important;
 }
-/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */
-.menus_items .menus_item:nth-child(2) .menus_item_child {
-  left: -125px;
-}
+/*!* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 *!*/
+/*.menus_items .menus_item:nth-child(2) .menus_item_child {*/
+/*  left: -125px;*/
+/*}*/
 
 .loading-img {
   background: url(/img/bread.jpg) no-repeat center center;
